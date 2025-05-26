@@ -1,0 +1,118 @@
+# 0.
+Nouget package letoltes:
+4 db Package telepítése szükséges:
+- Microsoft.EntityFrameWorkCore
+- Microsoft.EntityFrameWorkCore.Tools
+- Microsoft.EntityFrameWorkCore.SqlServer
+- Microsoft.EntityFrameWorkCore.Design/nemkell
+
+- Telepítésnél figyeljünk oda a .NET verziójára
+(.NET 7.0 esetén ne akarjunk 8.0.6 EntityFramework-öt telepíteni)
+
+# 0.1. -adatbázis létrehozása
+
+View -> Server Explorer
+
+Jobb katt a Server Explorer ablakban -> Add Connection
+
+Choose Data Source ablak -> Microsoft SQL Server Database File -> Continue/OK
+
+Következő ablakban->browse->válasszuk ki a mappát ahol az adatbázis fájlunkat
+szeretnénk tárolni, és adjuk meg a fájl nevét. Ezután a OK gomb és menjünk az
+Igen lehetőségre a felugró ablakon, hogy legenerálja a fájlt
+
+- Táblák:
+id (identity)
+[nev] NVARCHAR([karakterszám]) NOT NULL,
+
+kesz:update felul
+
+duplakatt a projektre és mentés
+
+Nouget konzol
+dotnet tool install --global dotnet-ef
+
+### Összekötés:
+Jobb klikk az adatbázisra->Properties->Connection
+string property mellett lévő teljes connection stringet másoljuk ki!
+Az összekötéshez nyissuk meg a Package Manager Console.
+1. Parancs – dotnet entityframework feltelepítése: dotnet tool
+install --global dotnet-ef (ha még nincs telepítve)
+2. Parancs: dotnet ef dbcontext scaffold "IDEJÖN
+A CONNECTIONSTRING" --context-
+dir [MappaNév(Órán:Context)] --context
+[Adatbázisneve(Órán:Database)]
+Microsoft.EntityFrameworkCore.SqlServer -o
+[Mappanév(Órán:Models)] --
+[project Projektneve_amivel_összekötöd]
+3. Ha olyan hiba üzenetet ír ki hogy hogy nem látja a projectet,
+akkor a konzolban cd projektneve és utána futtassuk a
+parancsot a –project Projektneve paraméter nélkül
+###
+
+# 1. Felület:
+
+Form név átállítás
+
+toolbox:
+Button,DataGridView,Textbox
+
+# 2. txt / # 3. megjelenítés
+
+behúzni a projektRE
+Properties - copy to output directory:copy always
+
+- Form.cs
+private [adatbazisnev-enterrel behuzva] context;
+public form1(){
+    context = new [adatbazisnev]();
+
+    var lines = File.ReadAllLines("[txtneve].txt");
+
+    //List<[Nev(enterrel)]> [nevek] = new List<[Nev]>();
+
+     var existingFilms =  new HashSet<string>(context.Films.Select(f => $"{f.Filmnev};{f.Ev};{f.Director}"));
+    
+    foreach (string line in lines)
+{
+    if (!existingFilms.Contains(line))
+    {
+        filmek.Add(new Film
+        {
+            Filmnev = line.Split(';')[0],
+            Ev = int.Parse(line.Split(';')[1]),
+            Director = line.Split(';')[2]
+        });
+    }
+}
+context.SaveChanges();
+loadData();
+}
+
+private void loadData()
+{
+    dataGridView1.DataSource = context.Films;
+}
+
+# 4. keresés / 5. rendezés
+
+private void btnSearch_Click(object sender, EventArgs e)
+{
+    if (!string.IsNullOrEmpty(txtSearch.Text))
+    {
+        string query = txtSearch.Text;
+        var results = context.Films.Where(f=> f.Filmnev.Contains(query.ToLower())).ToList();
+        dataGridView1.DataSource = results;
+    }
+    
+}
+
+private void btnYear_Click(object sender, EventArgs e)
+{
+    List<Film> filmek = new List<Film>();
+    filmek.AddRange(context.Films);
+    dataGridView1.DataSource = filmek.OrderBy(f => f.Ev).ToList();
+}
+
+
+
